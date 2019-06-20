@@ -1,9 +1,11 @@
-# node-nightly [![Build Status](https://travis-ci.org/hemanth/node-nightly.svg?branch=master)](https://travis-ci.org/hemanth/node-nightly)
+# node-get-run
+
+`node-get-run` installs specific versions of node, either nightlies or released versions, in a local folder.
 
 ## Install
 
 ```
-$ npm install --global node-nightly
+$ npm install --global node-get-run
 ```
 
 
@@ -11,33 +13,29 @@ $ npm install --global node-nightly
 
 __For the first time:__
 
-```sh 
-$ node-nightly 
-Downloading the nightly version, hang on...
-
-
-node-nightly is available on CLI!
+```sh
+$ node-get-run --release v12.0.1
+{status: installed}
 ```
 
-__And then:__
+And then just use `node-get-run` as if it were `node`:
 
 ```sh
-$ node-nightly --inspect --debug-brk index.js
-Debugger listening on port 9229.
-To start debugging, open the following URL in Chrome:
-    chrome-devtools://devtools/remote/serve_file/@521e5b7e2b7cc66b4006a8a54cb9c4e57494a5ef/inspector.html?experiments=true&v8only=true&ws=localhost:9229/node
-Debugger attached.
-Waiting for the debugger to disconnect...
+$ node-get-run --inspect --debug-brk index.js
 ```
 
-## Additional commands
+or
 
- 1. `node-nightly --version {version}` Install a specific nightly. This is useful if the nightly is broken.
- 2. `node-nightly --upgrade` Install the latest nightly
+```sh
+$ node-get-run index.js
+```
 
-__GIF FTW!__
+## Installation options
 
-![node-nightly](./node-nightly.gif)
+ 1. `node-get-run --nightly {version}` Install a specific nightly, e.g., `v12.0.0-nightly20181024bb79e768e5`
+ 2. `node-get-run --release {version}` Install a specific version, e.g., `v12.0.0`
+ 2. ~~`node-get-run --upgrade` Install the latest nightly~~ (tbd)
+ 2. ~~`node-get-run --clean` Delete the currently installed version~~ (tbd)
 
 
 ## License
