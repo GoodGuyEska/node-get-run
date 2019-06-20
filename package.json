@@ -1,6 +1,6 @@
 {
   "name": "node-get-run",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "get specific node versions, including nightly builds, and run them",
   "license": "MIT",
   "repository": "bmacnaughton/node-get-run",
@@ -17,7 +17,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "bin": {
-    "node-nightly": "./cli.js"
+    "node-get-run": "./cli.js"
   },
   "engines": {
     "node": ">=4"
