@@ -21,13 +21,13 @@ let p;
 if (nightlyIx >= 0) {
 	type = 'nightly';
 	version = args[nightlyIx + 1];
-	args = args.splice(nightlyIx, 2);
+	args.splice(nightlyIx, 2);
 	p = nodeGetRun.install(type, version);
 } else if (releaseIx >= 0) {
 	type = 'release';
 	version = args[releaseIx + 1];
 	p = nodeGetRun.install(type, version);
-	args = args.splice(releaseIx, 2);
+	args.splice(releaseIx, 2);
 } else {
 	// nothing requested so just run
 	p = Promise.resolve({status: 'running'});
