@@ -30,7 +30,8 @@
     "cli-app",
     "cli",
     "node",
-    "nightly"
+    "nightly", "nightlies",
+    "version", "versions"
   ],
   "dependencies": {
     "configstore": "^2.0.0",
