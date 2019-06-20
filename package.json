@@ -1,6 +1,6 @@
 {
   "name": "node-get-run",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "get specific node versions, including nightly builds, and run them",
   "license": "MIT",
   "repository": "bmacnaughton/node-get-run",
