@@ -3,56 +3,80 @@ const download = require('download');
 const nodeNightlyVersion = require('node-nightly-version');
 const Configstore = require('configstore');
 const pkg = require('./package.json');
-const rm = require('rimraf');
-const realFs = require('fs');
-const gracefulFs = require('graceful-fs');
-gracefulFs.gracefulify(realFs);
-const mv = gracefulFs.renameSync;
+const rimraf = require('rimraf');
+const fs = require('fs');
+const spawn = require('child_process').spawn;
 
-const extractDate = versionString => ~~versionString.split('nightly')[1].slice(0, 8);
-const compVersion = (currentVersion, latestVersion) => extractDate(currentVersion) < extractDate(latestVersion);
+const logger = new (require('debug-custom'))('node-get-run', {defaultLevels: process.env.NGR_LOG_SETTINGS});
+const log = {
+	error: logger.make('error'),
+	warn: logger.make('warn'),
+	info: logger.make('info'),
+}
+
+const os = process.platform === 'win32' ? 'win' : process.platform;
+const extension = os === 'win' ? 'zip' : 'tar.gz';
+const arch = process.arch === 'ia32' ? 'x86' : process.arch;
+const cwd = process.cwd();
+
+const targetDir = `${process.cwd()}/.node-get-run`;
 
 module.exports = {
 
-	install: (version) => {
-		let osArchString, nodeNightlyVer;
-		nodeNightlyVer = version !== undefined ? Promise.resolve(version) : nodeNightlyVersion();
+	install: (type, version) => {
 
-		return nodeNightlyVer.then(latest => {
-      const os = process.platform === 'win32' ? 'win' : process.platform,
-            extention = os === 'win' ? 'zip' : 'tar.gz',
-            arch = process.arch === 'ia32' ? 'x86' : process.arch,
-            type = 'nightly',
-            osArchString = `${latest}-${os}-${arch}`,
-            url = `https://nodejs.org/download/${type}/${latest}/node-${osArchString}.${extention}`,
-            nightlyDir = `${__dirname}/node-nightly`;
+		let url = 'https://nodejs.org/download/';
 
-      const extractedTo = `${__dirname}/node-${osArchString}`;
+		if (type === 'release') {
+			// see https://nodejs.org/download/release/
+			url += `release/${version}/node-${version}-${os}-${arch}.${extension}`;
+		} else if (type === 'nightly') {
+			// see https://nodejs.org/download/nightly/
+			url += `nightly/${version}/node-${version}-${os}-${arch}.${extension}`;
+		} else {
+			throw new TypeError(`invalid release type "${type}"`);
+		}
 
-      if (gracefulFs.existsSync(extractedTo)) {
-        rm.sync(extractedTo);
-      }
+		const tempDir = `${process.cwd()}/node-${version}-${os}-${arch}`;
 
-      return download(url, __dirname, {
-        extract: true
-      }).then(_ => {
-        if (gracefulFs.existsSync(nightlyDir)) {
-          console.log('Deleting old version');
-          rm.sync(nightlyDir);
-          console.log(`Deleted!\nInstalling newer version..`);
-        }
 
-        mv(extractedTo, nightlyDir);
-        console.log(`node-nightly is available on your CLI!`);
+		log.info(`downloading ${url}`);
 
-        new Configstore(pkg.name).set('version', version);
+		return new Promise((resolve, reject) => {
+			log.info(`deleting ${tempDir}/`);
+			rimraf(tempDir, e => {
+				e ? reject(e) : resolve();
+			})
+		})
+		.then(_ => {
+			log.info(`downloading ${url}`);
+			return download(url, process.cwd(), {extract: true})
+		})
+		.then(_ => {
+			return new Promise((resolve, reject) => {
+				log.info(`deleting ${targetDir}/`);
+				rimraf(targetDir, e => {
+					e ? reject(e) : resolve();
+				})
+			})
+		})
+		.then(_ => {
+			log.info(`renamed ${tempDir}/ to ${targetDir}/`)
+			return new Promise((resolve, reject) => {
+				fs.rename(tempDir, targetDir, e => {
+					e ? reject(e) : resolve();
+				})
+			})
+		})
+		.then(_ => {
+			new Configstore(pkg.name).set('version', version);
+			log.info('set config store');
+			return {status: 'installed'};
+		});
 
-        return 'Installed';
-      });
-    });
-  },
+	},
 
-  update: function() {
+  update: function () {
 		console.log('Checking for update...');
 		return this.check().then(updatedVersion => {
 			if (updatedVersion) {
@@ -62,7 +86,7 @@ module.exports = {
 		});
 	},
 
-	check: function() {
+	check: function () {
 		return nodeNightlyVersion().then(latestVersion => {
 			const currentVersion = new Configstore(pkg.name).get('version');
 			if (!currentVersion || compVersion(currentVersion, latestVersion)) {
@@ -70,5 +94,13 @@ module.exports = {
 			}
 			return false;
 		});
+	},
+
+	run: function (args) {
+		if (os === 'win') {
+			spawn(`${targetDir}/node`, args, {stdio: 'inherit', env: process.env});
+		} else {
+			spawn(`${targetDir}/bin/node`, args, {stdio: 'inherit', env: process.env});
+		}
 	}
 };

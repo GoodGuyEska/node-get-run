@@ -1,9 +1,9 @@
 {
-  "name": "node-nightly",
-  "version": "1.7.2",
-  "description": "node-nightly at your finger tips!",
+  "name": "node-get-run",
+  "version": "1.0.0",
+  "description": "get specific node versions, including nightly builds, and run them",
   "license": "MIT",
-  "repository": "hemanth/node-nightly",
+  "repository": "bmacnaughton/node-get-run",
   "author": {
     "name": "Hemanth.HM",
     "email": "hemanth.hm@gmail.com",
@@ -34,9 +34,8 @@
   ],
   "dependencies": {
     "configstore": "^2.0.0",
-    "cross-spawn": "4.0.0",
+    "debug-custom": "^1.0.6",
     "download": "^5.0.2",
-    "graceful-fs": "^4.1.6",
     "is-online": "^5.1.2",
     "node-nightly-version": "^1.0.6",
     "rimraf": "^2.5.4"

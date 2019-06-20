@@ -1,17 +1,45 @@
 #!/usr/bin/env node
 'use strict';
-const spawn = require('cross-spawn').spawn;
-const nodeNightly = require('./');
-const existsSync = require('graceful-fs').existsSync;
+const nodeGetRun = require('./');
 const isOnline = require('is-online');
 
 const os = process.platform  === 'win32' ? 'win' : process.platform;
 let args = process.argv.slice(2);
 
 // Check for upgrade.
-let upgradeIndex = args.indexOf('--upgrade'),
-    versionIndex = args.indexOf('--version'),
-    version = versionIndex < 0 ? null : args[versionIndex + 1];
+const nightlyIx = args.indexOf('--nightly');
+const releaseIx = args.indexOf('--release');
+
+if (nightlyIx >= 0 && releaseIx >= 0) {
+	throw new TypeError('cannot specify both --nightly and --release');
+}
+
+let type;
+let version;
+let p;
+
+if (nightlyIx >= 0) {
+	type = 'nightly';
+	version = args[nightlyIx + 1];
+	args = args.splice(nightlyIx, 2);
+	p = nodeGetRun.install(type, version);
+} else if (releaseIx >= 0) {
+	type = 'release';
+	version = args[releaseIx + 1];
+	p = nodeGetRun.install(type, version);
+	args = args.splice(releaseIx, 2);
+} else {
+	// nothing requested so just run
+	p = Promise.resolve({status: 'running'});
+}
+
+console.log('going to run with args', args);
+
+p.then(console.log)
+	.then(_ => nodeGetRun.run(args))
+	.catch(console.error);
+
+return;
 
 if (version) {
 	nodeNightly.install(version).catch(console.error);
