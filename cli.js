@@ -30,13 +30,11 @@ if (nightlyIx >= 0) {
 	args.splice(releaseIx, 2);
 } else {
 	// nothing requested so just run
-	p = Promise.resolve({status: 'running'});
+	nodeGetRun.run(args);
+	return 0;
 }
 
-console.log('going to run with args', args);
-
 p.then(console.log)
-	.then(_ => nodeGetRun.run(args))
 	.catch(console.error);
 
 return;
