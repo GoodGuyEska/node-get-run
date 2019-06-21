@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 const nodeGetRun = require('./');
+const pkg = require('./package.json');
 const isOnline = require('is-online');
 
 const os = process.platform  === 'win32' ? 'win' : process.platform;
@@ -30,8 +31,12 @@ if (nightlyIx >= 0) {
 	args.splice(releaseIx, 2);
 } else {
 	// nothing requested so just run
-	nodeGetRun.run(args);
-	return 0;
+  const cp = nodeGetRun.run(args);
+  if (cp.error && cp.error.errno === 'ENOENT') {
+    console.error(`${pkg.name} has not installed a version of node in this directory`);
+    console.error('please use either --nightly, --release, or --version to install one');
+  }
+	process.exit(1);
 }
 
 p.then(console.log)
