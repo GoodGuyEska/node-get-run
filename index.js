@@ -5,7 +5,7 @@ const Configstore = require('configstore');
 const pkg = require('./package.json');
 const rimraf = require('rimraf');
 const fs = require('fs');
-const spawn = require('child_process').spawn;
+const spawnSync = require('child_process').spawnSync;
 
 const logger = new (require('debug-custom'))('node-get-run', {defaultLevels: process.env.NGR_LOG_SETTINGS});
 const log = {
@@ -27,13 +27,16 @@ module.exports = {
 
 		let url = 'https://nodejs.org/download/';
 
-		if (type === 'release') {
-			// see https://nodejs.org/download/release/
-			url += `release/${version}/node-${version}-${os}-${arch}.${extension}`;
-		} else if (type === 'nightly') {
-			// see https://nodejs.org/download/nightly/
-			url += `nightly/${version}/node-${version}-${os}-${arch}.${extension}`;
-		} else {
+		if (type === 'release' || type === 'nightly') {
+			// see https://nodejs.org/download/release/ and https://nodejs.org/download/nightly/
+			url += `${type}/${version}/node-${version}-${os}-${arch}.${extension}`;
+        } else if (type === 'version') {
+            if (version.indexOf('nightly') >= 0) {
+                url += `nightly/${version}/node-${version}-${os}-${arch}.${extension}`;
+            } else {
+                url += `release/${version}/node-${version}-${os}-${arch}.${extension}`;
+            }
+        } else {
 			throw new TypeError(`invalid release type "${type}"`);
 		}
 
@@ -97,10 +100,12 @@ module.exports = {
 	},
 
 	run: function (args) {
+    let cp;
 		if (os === 'win') {
-			spawn(`${targetDir}/node`, args, {stdio: 'inherit', env: process.env});
-		} else {
-			spawn(`${targetDir}/bin/node`, args, {stdio: 'inherit', env: process.env});
-		}
-	}
+      cp = spawnSync(`${targetDir}/node`, args, {stdio: 'inherit', env: process.env});
+    } else {
+      cp = spawnSync(`${targetDir}/bin/node`, args, {stdio: 'inherit', env: process.env});
+    }
+    return cp;
+	  }
 };
