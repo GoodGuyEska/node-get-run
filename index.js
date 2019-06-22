@@ -17,26 +17,24 @@ const log = {
 const os = process.platform === 'win32' ? 'win' : process.platform;
 const extension = os === 'win' ? 'zip' : 'tar.gz';
 const arch = process.arch === 'ia32' ? 'x86' : process.arch;
-const cwd = process.cwd();
 
 const targetDir = `${process.cwd()}/.node-get-run`;
 
 module.exports = {
 
 	install: (type, version) => {
-
 		let url = 'https://nodejs.org/download/';
 
 		if (type === 'release' || type === 'nightly') {
 			// see https://nodejs.org/download/release/ and https://nodejs.org/download/nightly/
 			url += `${type}/${version}/node-${version}-${os}-${arch}.${extension}`;
-        } else if (type === 'version') {
-            if (version.indexOf('nightly') >= 0) {
-                url += `nightly/${version}/node-${version}-${os}-${arch}.${extension}`;
-            } else {
-                url += `release/${version}/node-${version}-${os}-${arch}.${extension}`;
-            }
-        } else {
+    } else if (type === 'version') {
+      if (version.indexOf('nightly') >= 0) {
+        url += `nightly/${version}/node-${version}-${os}-${arch}.${extension}`;
+      } else {
+        url += `release/${version}/node-${version}-${os}-${arch}.${extension}`;
+      }
+    } else {
 			throw new TypeError(`invalid release type "${type}"`);
 		}
 
@@ -100,12 +98,8 @@ module.exports = {
 	},
 
 	run: function (args) {
-    let cp;
-		if (os === 'win') {
-      cp = spawnSync(`${targetDir}/node`, args, {stdio: 'inherit', env: process.env});
-    } else {
-      cp = spawnSync(`${targetDir}/bin/node`, args, {stdio: 'inherit', env: process.env});
-    }
+    const executable = os === 'win' ? `${targetDir}/node` : `${targetDir}/bin/node`;
+    const cp = spawnSync(executable, args, {stdio: 'inherit', env: process.env});
     return cp;
 	  }
 };
