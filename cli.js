@@ -7,36 +7,55 @@ const isOnline = require('is-online');
 const os = process.platform  === 'win32' ? 'win' : process.platform;
 let args = process.argv.slice(2);
 
-// Check for upgrade.
-const nightlyIx = args.indexOf('--nightly');
-const releaseIx = args.indexOf('--release');
-
-if (nightlyIx >= 0 && releaseIx >= 0) {
-	throw new TypeError('cannot specify both --nightly and --release');
+// Check for version to install.
+const options = ['nightly', 'release', 'version'];
+let n = 0;
+let ix = -1;
+for (let i = 0; i < options.length; i++) {
+  const index = args.findIndex(arg => arg.indexOf(`--${options[i]}`) === 0);
+  if (index >= 0){
+     if (ix >= 0) {
+       throw new TypeError(`can only specify one: ${options.join(', ')}`);
+     }
+     ix = index;
+  }
 }
 
-let type;
-let version;
 let p;
 
-if (nightlyIx >= 0) {
-	type = 'nightly';
-	version = args[nightlyIx + 1];
-	args.splice(nightlyIx, 2);
-	p = nodeGetRun.install(type, version);
-} else if (releaseIx >= 0) {
-	type = 'release';
-	version = args[releaseIx + 1];
-	p = nodeGetRun.install(type, version);
-	args.splice(releaseIx, 2);
-} else {
-	// nothing requested so just run
-  const cp = nodeGetRun.run(args);
-  if (cp.error && cp.error.errno === 'ENOENT') {
-    console.error(`${pkg.name} has not installed a version of node in this directory`);
-    console.error('please use either --nightly, --release, or --version to install one');
+if (ix >= 0) {
+  // allow either --version <version> or --version=<version>
+  const option = args[ix].split('=');
+
+  const type = option[0].slice(2);
+  let version;
+  let removeCount;
+
+  if (option.length === 1) {
+    version = args[ix + 1];
+    removeCount = 2;
+  } else if (option.length === 2) {
+    version = option[1];
+    removeCount = 1;
+  } else if (option.length > 2) {
+    throw new TypeError(`invalid option: ${args[ix]}`);
   }
-	process.exit(1);
+
+  args.splice(ix, removeCount);
+  p = nodeGetRun.install(type, version);
+} else {
+  // no installation requested so just run what's there.
+  let status = 0;
+  const cp = nodeGetRun.run(args);
+  if (cp.error) {
+    status = 1;
+
+    if (cp.error.errno === 'ENOENT') {
+      console.error(`${pkg.name} has not installed a version of node in this directory`);
+      console.error('please use either --nightly, --release, or --version to install one');
+    }
+  }
+  process.exit(status);
 }
 
 p.then(console.log)
