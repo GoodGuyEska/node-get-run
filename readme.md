@@ -37,6 +37,10 @@ $ node-get-run index.js
  2. ~~`node-get-run --upgrade` Install the latest nightly~~ (tbd)
  2. ~~`node-get-run --clean` Delete the currently installed version~~ (tbd)
 
+## Clean-up
+
+To delete `node-get-run`'s currently installed version of node just `rm -rf .node-get-run`.
+
 
 ## Credit
 
