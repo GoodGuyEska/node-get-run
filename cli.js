@@ -42,6 +42,10 @@ if (ix >= 0) {
     throw new TypeError(`invalid option: ${args[ix]}`);
   }
 
+  if (version[0] !== 'v') {
+    version = 'v' + version;
+  }
+
   args.splice(ix, removeCount);
   p = nodeGetRun.install(type, version);
 } else {
