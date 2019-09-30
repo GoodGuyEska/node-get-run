@@ -40,7 +40,7 @@ $ node-get-run index.js
 
 ## Credit
 
-This is a derived from node-nightly [node-nightly](https://github.com/hemanth/node-nightly), from which
+This is a derived from [node-nightly](https://github.com/hemanth/node-nightly), from which
 I got the idea. I changed it to enable a nightly, version, or release to be specified as opposed to just
 a nightly. I also removed the ability to just fetch the latest nightly until I think it through. I'm not sure
 how `--upgrade` should interact with the version relative to the version currently installed, e.g., if node
