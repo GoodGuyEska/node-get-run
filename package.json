@@ -1,14 +1,20 @@
 {
   "name": "node-get-run",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "get specific node versions, including nightly builds, and run them",
   "license": "MIT",
   "repository": "bmacnaughton/node-get-run",
   "author": {
-    "name": "Hemanth.HM",
-    "email": "hemanth.hm@gmail.com",
-    "url": "h3manth.com"
+    "name": "Bruce A. MacNaughton",
+    "email": "bmacnaughton@gmail.com"
   },
+  "contributors": [
+    {
+      "name": "Hemanth.HM",
+      "email": "hemanth.hm@gmail.com",
+      "url": "h3manth.com"
+    }
+  ],
   "scripts": {
     "test": "node cli.js -v"
   },
@@ -30,10 +36,13 @@
     "cli-app",
     "cli",
     "node",
-    "nightly", "nightlies",
-    "version", "versions"
+    "nightly",
+    "nightlies",
+    "version",
+    "versions"
   ],
   "dependencies": {
+    "axios": "^0.19.0",
     "configstore": "^2.0.0",
     "debug-custom": "^1.0.6",
     "download": "^5.0.2",

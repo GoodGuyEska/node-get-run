@@ -38,6 +38,16 @@ $ node-get-run index.js
  2. ~~`node-get-run --clean` Delete the currently installed version~~ (tbd)
 
 
+## Credit
+
+This is a derived from node-nightly [node-nightly](https://github.com/hemanth/node-nightly), from which
+I got the idea. I changed it to enable a nightly, version, or release to be specified as opposed to just
+a nightly. I also removed the ability to just fetch the latest nightly until I think it through. I'm not sure
+how `--upgrade` should interact with the version relative to the version currently installed, e.g., if node
+`v10.15.1` is installed does `--upgrade` mean upgrade to a more current version of node 10 or the next node
+10 nightly past `v10.15.1` or the latest nightly regardless of the node version currently installed.
+
+
 ## License
 
 MIT © [Hemanth.HM](https://h3manth.com)
